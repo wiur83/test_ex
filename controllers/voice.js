@@ -73,8 +73,8 @@ router.get("/talk-login", verify, async (req, res) => {
         if (parseInt(counterWords) > parseInt(startCounter)) {
             res.redirect('./talk-more');
         } if (counterWords == startCounter) {
-            let userBackupId = req.cookies['userBackupId'];
-            let score = parseInt(req.cookies['score']);
+            let userBackupId = await req.cookies['userBackupId'];
+            let score = await req.cookies['score'];
 
             // Adds score to statistics in DB
             await VoiceMethods.addToStatistics(userBackupId, parseInt(score), parseInt(counterWords));
