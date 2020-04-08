@@ -19,22 +19,22 @@ router.get("/start", async (req, res) => {
     let userBackupId = await req.cookies['userBackupId'];
     console.log(userBackupId);
     let userWords = await VoiceMethods.getUserWords(userBackupId);
-    console.log(userWords);
+
     res.cookie("userWords", userWords);
     // global.userWords = await VoiceMethods.getUserWords();
 
     //Counter for the words sent to test
     let words = await req.cookies['words'];
-    console.log(words);
+
 
     let counterWordsInt = await req.cookies['counterWords'];
-    console.log(counterWordsInt);
+
 
     let startCounter = await req.cookies['startCounter'];
-    console.log(startCounter);
+
 
     let scoreInt = await req.cookies['score'];
-    console.log(scoreInt);
+
 
     res.render("../views/start.ejs");
 });
@@ -51,16 +51,18 @@ router.get("/talk-login", verify, async (req, res) => {
     } else if (req.user == "Invalid token") {
         res.render("../views/error.ejs", {msg: "Wrong email or password"});
     } else {
+        let userBackupId = await req.cookies['userBackupId'];
+        console.log(userBackupId);
         //Sets the current word that is sent to user
         let userWords = await req.cookies['userWords'];
-        console.log(userWords);
+
         let startCounter = await req.cookies['startCounter'];
-        console.log(startCounter);
+
 
         let currentWord = await Object.keys(userWords)[parseInt(startCounter)];
         res.cookie("currentWord", currentWord);
         // global.currentWord = Object.keys(global.userWords)[global.startCounter];
-        console.log(currentWord);
+
 
         let currentResWords = userWords[currentWord];
         res.cookie("currentResWords", currentResWords);
@@ -68,7 +70,7 @@ router.get("/talk-login", verify, async (req, res) => {
 
         //Check if test if finished or not
         let counterWords = await req.cookies['counterWords'];
-        console.log(counterWords);
+
 
         if (parseInt(counterWords) > parseInt(startCounter)) {
             res.redirect('./talk-more');
@@ -87,6 +89,8 @@ router.get("/talk-login", verify, async (req, res) => {
 //talk-login GET
 router.get("/talk-more", verify, async (req, res) => {
     //Verifies(verify middleware) that user logged in.
+    let userBackupId = await req.cookies['userBackupId'];
+    console.log(userBackupId);
     let currentWord = await req.cookies['currentWord'];
     res.render("../views/talk.ejs", { msg: currentWord });
 });
@@ -97,6 +101,8 @@ router.post("/submit", async (req, res) => {
     //Adds one(1) to startCounter
     let startCounter = await req.cookies['startCounter'];
     let startCounterInt = parseInt(startCounter);
+    let userBackupId = await req.cookies['userBackupId'];
+    console.log(userBackupId);
     res.cookie("startCounter", parseInt(startCounterInt+1));
     // global.startCounter = global.startCounter + 1;
 
@@ -114,7 +120,8 @@ router.post("/submit", async (req, res) => {
         // word exist
         // global.result = "rätt";
         let score = await req.cookies['score'];
-        let userBackupId = await req.cookies['userBackupId'];
+
+
         // let subWord = await req.cookies['subWord'];
 
         await VoiceMethods.addToNrOfTries(userBackupId, subWord);
@@ -139,6 +146,9 @@ router.post("/submit", async (req, res) => {
         } else {
             //No clash. Word added to res_word
             // global.result = "fel";
+            console.log("v");
+            console.log(userBackupId);
+            console.log("A");
 
             let currentWord = await req.cookies['currentWord'];
             await VoiceMethods.addResWord(userBackupId, currentWord, subWord);
@@ -182,8 +192,8 @@ router.get("/restart", verify, async (req, res) => {
     // res.cookie("startCounter", parseInt(0));
     // res.cookie("score", parseInt(0));
 
-    res.clearCookie('globalToken');
     res.clearCookie('userBackupId');
+    res.clearCookie('globalToken');
     res.clearCookie('words');
     res.clearCookie('userWords');
     res.clearCookie('counterWords');
@@ -196,6 +206,7 @@ router.get("/restart", verify, async (req, res) => {
     res.clearCookie('currentWord');
     console.log(req.cookies);
 
+
     res.redirect('./restart-log');
     // res.redirect('./talk-login');
 });
@@ -203,6 +214,11 @@ router.get("/restart", verify, async (req, res) => {
 
 //restart GET
 router.get("/restart-log", verify, async (req, res) => {
+    //Words are imported from words-table in DB and stored
+    //in memory
+
+
+
 
     console.log("---------------------------------------");
     console.log(req.cookies);
